@@ -1,0 +1,112 @@
+masm
+model small
+.stack 256
+.data
+x dw ?
+y dw ?
+.code
+
+risovka proc near ;procedura risovki
+    cycle:
+        push cx 
+        mov ah,0Ch 
+        mov al,15 ;tsvet
+        mov bh,0 
+        mov cx,si 
+        mov dx, di
+        int 10h
+        add si,x 
+        add di,y 
+        pop cx 
+    loop cycle
+ret
+
+main:   mov ah,4Fh 
+        mov al,02
+        mov bx,103h
+        int 10h
+        
+        ;Dno
+        mov cx,300 ; Dlina
+        mov si,500 ;x
+        mov di,500 ;y
+        mov x,-1
+        mov y,0
+        call risovka
+        
+        ;Pravyi bort
+        mov cx,90
+        mov si,500
+        mov di,500
+        mov x,+1
+        mov y,-1 
+        call risovka
+        
+        ;Levyi bort
+        mov cx,90
+        mov si,200
+        mov di,500
+        mov x,-1
+        mov y,-1
+        call risovka
+        
+        ;Paluba
+        mov cx,480 
+        mov si,590
+        mov di,410
+        mov x,-1
+        mov y,0
+        call risovka
+        
+        ;Machta
+        mov cx,220
+        mov si,350 
+        mov di , 410
+        mov x,0
+        mov y,-1
+        call risovka
+        
+        ;Levyi tros
+        mov cx,150
+        mov si,500
+        mov di,410 
+        mov x,-1
+        mov y,-1
+        call risovka
+        
+        ;Pravyi tros
+        mov cx,150
+        mov si , 200
+        mov di,410 
+        mov x,+1
+        mov y,-1
+        call risovka
+        
+        ;Flag
+        mov cx,80 
+        mov si,350
+        mov di,190
+        mov x,1
+        mov y,0
+        call risovka
+        mov cx,20 
+        mov si,430 
+        mov di,190 
+        mov x,-1
+        mov y,1 
+        call risovka
+        mov cx,20 
+        mov si,430 
+        mov di,230 
+        mov x,-1
+        mov y,-1 
+        call risovka
+        mov cx,80
+        mov si,350
+        mov di,230
+        mov x,1
+        mov y,0
+        call risovka
+        mov ax, 4c00h
+        int 21h
+end main        

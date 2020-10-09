@@ -1,0 +1,178 @@
+data segment
+    first_number db 60 dup(0)
+    first_number_minus db 0
+    
+    second_number db 60 dup(0)
+    second_number_minus db 0
+    
+    buf db 60,?, 60 dup(0)  
+    buf1 db 60,?,60 dup(0)
+    
+   
+
+    znaki db 1,2,3,4,5,6,7,8,9,0
+    
+    banz db 10,13,'BAN$'
+    
+    buff_chislo db 0
+    
+    buff_reg dw 2 dup (0)
+    q dw ?
+ends
+
+stack segment
+    dw   256  dup(0)
+ends
+
+
+macro chislo num
+    local m1
+    local sovpadenie
+    local nextz
+    local go
+    
+    pusha
+    xor si, si
+    xor dx, dx
+    mov cx, 10
+    m1:  
+        xor ax, ax
+        mov al, num
+        
+
+        mov ah, znaki[si]
+        cmp al, ah
+        je sovpadenie
+        jne nextz
+        sovpadenie:
+            jmp go
+        nextz:
+        inc si
+        loop m1
+    mov dx,offset banz
+    mov ah, 9
+    int 21h
+    mov ax, 4c00h
+    int 21h
+    go:
+    popa
+endm 
+            
+           
+
+code segment
+start:
+; set segment registers:
+    mov ax, data
+    mov ds, ax
+    mov es, ax
+    
+    
+    ;vvod first numbr
+    lea dx,buf
+    mov ah,10
+    int 21h
+
+    
+    mov si, 2
+    xor cx,cx
+    mov cl, buf[1]
+    mov di, 59
+    m1:
+        xor ax,ax
+        mov al ,buf[si]
+        cmp al,'-'
+        je minus
+        jne next
+        minus:
+            mov first_number_minus, 1
+            inc si
+            dec buf[1]
+            jmp next_j
+        next:
+        sub al, 30h 
+        chislo buff_chislo 
+        mov buff_chislo, al
+        mov first_number[di],al
+        inc si
+        dec di
+        next_j:
+        loop m1
+        
+    ;second number
+    mov dx, 10   
+    mov ah, 2
+    int 21h
+        
+    mov dx, 13
+    int 21h
+        
+        
+    lea dx, buf1
+    mov ah, 10
+    int 21h
+    
+    mov si, 2
+    xor cx,cx
+    mov cl, buf1[1]
+    mov di, 59
+    m2:
+        xor ax,ax
+        mov al ,buf1[si]
+        cmp al,'-'
+        je minus1
+        jne next1
+        minus1:
+            mov second_number_minus, 1
+            inc si
+            dec buf1[1]
+            jmp next_j1
+        next1:
+        sub al, 30h 
+        chislo buff_chislo 
+        mov buff_chislo, al
+        mov second_number[di],al
+        inc si
+        dec di
+        next_j1:
+        loop m2 
+    
+    xor ax,ax
+    xor bx,bx
+    mov dl,buf[1]
+    sub dl,buf1[1]
+    mov buf1,dl
+    mov cl,dl
+    
+    m3:
+        add q,1
+    loop m3
+    mov cx,30
+    mov si,59
+    xor di,di
+    full:
+        mov al,first_number[si]
+        mov ah,first_number[di]
+        mov first_number[si],ah
+        mov first_number[di],al
+        
+        add si,q
+        mov al,second_number[si]
+        mov ah,second_number[di]
+        sub si,q
+        add di,q
+        mov second_number[di],al
+        mov second_number[si],ah
+        sub di,q
+        
+        dec si
+        inc di
+        
+    loop full
+               
+    
+    mov ax, 4c00h ; exit to operating system.
+    int 21h    
+ends
+
+end start ; set entry point and stop the assembler.

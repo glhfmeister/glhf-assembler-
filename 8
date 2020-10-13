@@ -1,0 +1,90 @@
+masm
+model small
+.stack 256
+.data
+
+inppas db 'Input password'
+
+.code
+begin:
+    mov ax,@data
+    mov ds,ax
+    mov ah,10h
+    mov al,03h
+    mov bl,0
+    int 10h
+    
+    mov ah,07h
+    mov al,0
+    mov bl,0
+    mov cl,0
+    mov ch,0
+    mov dl,79
+    mov dh,24
+
+    mov bl,0
+    int 10h
+    mov ax,0700h
+    mov cl,10
+    mov ch,8
+    mov dl,70
+    mov dh,12
+    mov bh,4
+    shl bh,4
+    int 10h
+    
+    mov ah,13h
+    mov al,0
+    mov bl,4eh
+    mov cx,14
+    mov dh,9
+    mov dl,33
+    push ds
+    pop es
+    lea bp,inppas
+    int 10h
+    
+;    mov ah,02h 
+;    mov dh,10 
+;    mov dl,10
+;    int 10h
+;    
+;    mov cx,14
+;    xor si,si
+;    mov dl,33
+;m1:
+;    mov ah,02h
+;    mov bh,0
+;    mov dh,10
+;    int 10h
+;    mov ah,0eh ;вывод первого слова
+;    mov al,inppas[si]
+;    mov bh,0
+;    inc dl
+;    inc si
+;    int 10h
+;loop m1
+
+    mov ah,10h
+    mov al,03h
+    mov bl,0
+    int 10h
+    mov ax,0700h
+    mov cl,33
+    mov ch,11
+    mov dl,47
+    mov dh,11
+    mov bh,0
+    shl bh,4
+    int 10h
+    
+    mov ah,02h
+    mov bh,0
+    mov dh,11
+    mov dl,12
+
+    
+    
+    mov ax,4c00h
+    int 21h
+end begin

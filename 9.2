@@ -1,0 +1,94 @@
+data segment
+    mes db 10,10 dup (?)
+    lenmes db 0
+    mes1 db 10,10 dup (?)
+    lenmes1 db 0
+    curl db 15
+    answer db 10,10 dup (?)
+ends
+
+stack segment
+    dw   128  dup(0)
+ends
+draw macro color,x1,y1,x2,y2
+    mov ah,07h
+    mov al,0
+    mov bh,color
+    shl bh,4
+    mov ch,y1
+    mov cl,x1
+    mov dh,y2
+    mov dl,x2
+    int 10h
+endm
+
+output macro len,word
+    local q
+    mov si,2
+    
+    xor ch,ch
+    mov cl,len
+    q:  
+        push cx
+        mov ah,09h
+        mov al,word[si]
+        mov bh,0
+        mov bl,04eh
+        int 10h
+        mov ah,02h
+        mov cx,1
+        mov dh,2
+        mov dl,curl
+        int 10h
+        inc curl
+        inc si
+        pop cx
+    loop q
+endm
+
+code segment
+start:
+    mov ax,data
+    mov ds,ax
+    mov es,ax
+    
+    mov ah,10
+    lea dx,mes
+    int 21h
+    
+    mov ah,10
+    lea dx,mes1
+    int 21h
+    
+ draw 4,0,0,40,15
+ draw 0,15,2,25,2
+ draw 0,15,4,25,4    
+    
+
+
+    mov ah,02h
+    mov dh,2
+    mov dl,15
+    int 10h
+    
+    mov bl,mes[1]
+    mov lenmes,bl
+    output lenmes,mes
+    
+    mov ah,0ah
+    lea dx,mes1
+    int 21h
+    
+    mov si,2
+    xor di,di
+    
+    q:
+        mov al,mes[si]
+        mov answer[di],al        
+
+mov ax, 4c00h
+int 21h  
+
+ends
+
+end start
